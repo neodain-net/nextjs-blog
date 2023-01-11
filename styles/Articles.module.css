@@ -42,7 +42,7 @@
 }
 
 .card:hover {
-  box-shadow: 0 4px 8px 0 rgb(48, 129, 235, 0.7);
+  box-shadow: 0 4px 8px 0 rgb(48, 129, 235, 0.5);
 }
 
 .card_page {
@@ -116,7 +116,6 @@
   .card {
     height: 500px;
     padding: 15px;
-    /* border-radius: 10px; */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   }
 
@@ -135,9 +134,8 @@
   }
 
   .card:hover {
-    height: auto;
+    height: 500px;
     padding: 15px;
-    border-radius: 10px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); */
     box-shadow: 0 4px 8px 0 rgb(48, 129, 235, 0.5);
   }
@@ -153,7 +151,6 @@
   .card {
     height: auto;
     padding: 15px;
-    /* border-radius: 10px; */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   }
 
@@ -165,23 +162,7 @@
   .card:hover {
     height: auto;
     padding: 15px;
-    border-radius: 10px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); */
     box-shadow: 0 4px 8px 0 rgb(48, 129, 235, 0.5);
   }
 }
-
-/* .post-body ul,
-ol {
-  font-size: 110%;
-  line-height: 2.3;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.post-body pre {
-  background: #f4f4f4;
-  padding: 20px;
-  margin: 20px 0;
-  line-height: 2.3;
-} */
