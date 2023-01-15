@@ -1,0 +1,168 @@
+---
+title: NodeJS Pagination with using Typescript
+tags:
+  - nodejs
+  - typescript
+date: 2023-01-14
+excerpt: Let's implement Pagenation using Typescript and Nodejs express server.
+cover_image: "/images/ocean.jpg"
+---
+
+This post is a simple example of how pagination can be implemented in an **NodeJS Express server** using **TypeScript** and it demonstrates the use of middleware functions to handle pagination logic, and how the locals property can be used to store and pass data between middleware functions and route handlers.
+
+Let's implement multi root Pagination using Typescript and Nodejs express server.
+
+- server : NodeJS / express
+- client : Rest Client
+- database : internal values, Json placeholder, Json server
+
+This code sets up a simple Express server using TypeScript. It creates an instance of the App class, which sets up an Express application and uses the json middleware to parse incoming JSON requests.
+
+```typescript
+import express, { Request, Response, NextFunction } from "express";
+
+class App {
+  public application: express.Express;
+
+  constructor() {
+    this.application = express();
+    this.application.use(express.json());
+  }
+}
+
+const app = new App().application;
+```
+
+It then defines a couple of routes, one for "users" and one for "posts", which are handled by the **paginationResults** middleware. This middleware takes in an array of Model objects as its parameter, extracts the page and limit query parameters from the request, performs some basic validation, and then slices the model array to return a paginated result. The pagination result is then added to the res.locals object and passed to the next middleware.
+
+```typescript
+interface Model {
+  id: number;
+  name: string;
+}
+
+const users: Model[] = [
+  { id: 1, name: "user 1" },
+  { id: 2, name: "user 2" },
+  { id: 3, name: "user 3" },
+  ...
+];
+
+const posts: Model[] = [
+  { id: 1, name: "post 1" },
+  { id: 2, name: "post 2" },
+  { id: 3, name: "post 3" },
+  ...
+];
+
+app.get("/", (req: Request, res: Response) => {
+  res.json({ data: "say Hello" });
+  res.json();
+});
+
+// root 1 : /users
+app.get("/users", paginationResults(users), (req: Request, res: Response) => {
+  res.json(res.locals.paginationResult);
+});
+
+// root 2 : /posts
+app.get("/posts", paginationResults(posts), (req: Request, res: Response) => {
+  res.json(res.locals.paginationResult);
+});
+```
+
+Then, it defines the route handlers for each route, which simply return the pagination result from the **res.locals** object in the **response**.
+
+## Pagination
+
+You can test this code by running the server in your local environment and making a GET request to either of the routes, passing in the **page** and **limit** query parameters.
+
+Also, it is using the **Request**, **Response** and **NextFunction** types from express module and it is imported using the destructuring import statement import express, `import { Request, Response, NextFunction } from "express";`. This allows you to use these types without having to qualify them with the express namespace.
+
+```typescript
+function paginationResults(model: Model[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    let page: number = parseInt(req.query.page as string);
+    let limit: number = parseInt(req.query.limit as string);
+
+    // validation
+    if (isNaN(page) || page < 1) {
+      page = 1;
+    }
+    if (isNaN(limit) || limit < 1) {
+      limit = 10;
+    }
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    res.locals.paginationResult = {
+      result: model.slice(startIndex, endIndex),
+      prev: page > 1 ? { page: page - 1, limit } : undefined,
+      next: endIndex < model.length ? { page: page + 1, limit } : undefined,
+    };
+    next();
+  };
+}
+
+app.listen(3000);
+```
+
+## Express's locals property
+
+the code also uses **Express's locals property** to store the pagination results. **locals** is a property on the response object that can be used to store data that is specific to the current request-response cycle. In this code, **the pagination results are stored in res.locals.paginationResult so that they can be easily accessed in the route handlers.**
+
+In the route handlers, the `res.json(res.locals.paginationResult)` is used to send the pagination result as a JSON object in the response.
+
+## validation
+
+It is also worth noting that the paginationResults function uses the parseInt function to convert the page and limit query parameters from strings to integers. If the parse fails, **NaN** is returned. The isNaN function is used to check if the parsed value is NaN or not. If it is, the function assigns a default value of 1 to page and 10 to limit
+
+Overall, this code is a simple example of how pagination can be implemented in an Express server using TypeScript and it demonstrates the use of middleware functions to handle pagination logic, and how the locals property can be used to store and pass data between middleware functions and route handlers.
+
+Finally, the server is set to listen on port 3000, so it can start receiving incoming requests.
+
+## How to use REST Client
+
+- Server : Node.JS express server
+- Client : REST Client `(VS-Code extension)`
+
+1. create \*.rest file and then use GET / PUT method
+
+```typescript
+send request click
+ex) GET http://localhost:3000/  => server : app.get('/', (req, res) => {});
+```
+
+2. Sends the Get Mehthod including page&limit query to the server.
+
+```typescript
+[root 1 : /users]
+ex) GET http://localhost:3000/users?page=2&limit=3
+
+[root 2 : /posts]
+ex) GET http://localhost:3000/posts?page=2&limit=3
+```
+
+## object type declaration
+
+Extending an object type: interface uses the extends keyword and type uses the & operator
+
+- interface : extends keyword
+- type : & operator
+
+An interface can extend multiple interfaces, creating a combination of all of the interfaces.
+
+```typescript
+interface i_next {
+  next: {};
+}
+
+interface i_prev {
+  prev: {};
+}
+
+interface i_results extends i_next, i_prev {
+  result: {};
+}
+```
