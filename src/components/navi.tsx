@@ -40,20 +40,20 @@ export default function Navigation() {
       </div>
       <div className="navi-menu" id={mobileMenu ? "mobile-menu" : ""}>
         <ul className="menu-list">
-          <li className="Trend">
-            <Link href="/">MEMU_1</Link>
+          <li className="life">
+            <Link href="/">Life</Link>
           </li>
-          <li className="Language">
-            <Link href="/posts/sqream">MEMU_2</Link>
+          <li className="trend">
+            <Link href="/posts/sqream">Trend</Link>
           </li>
-          <li className="Gallery">
-            <Link href="/posts/swr">MEMU_3</Link>
+          <li className="gallery">
+            <Link href="/posts/swr">Gallery</Link>
           </li>
-          <li className="Life">
-            <Link href="/posts/reduce">MEMU_4</Link>
+          <li className="language">
+            <Link href="/posts/reduce">Language</Link>
           </li>
-          <li className="About">
-            <Link href="/posts/sqream">MEMU_5</Link>
+          <li className="contact">
+            <Link href="/posts/sqream">Contact</Link>
           </li>
         </ul>
       </div>
