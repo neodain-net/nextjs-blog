@@ -1,0 +1,490 @@
+---
+title: How to implement the strategy pattern in Rust
+tags:
+  - language
+  - rust
+date: 2023-01-17
+excerpt: Using a strategy pattern, Let's see how to implement Rust program that parses an XML file's service information and creates classes based on the service information.
+cover_image: "/images/img1.jpg"
+profile_image: ""
+star_rating: 0
+weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
+---
+
+Using a [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern), Let's see how to implement [Rust](https://doc.rust-lang.org/book/title-page.html) program that parses an [XML](https://en.wikipedia.org/wiki/XML) file's service information and creates classes based on the service information.
+
+- Korean Reference : [The Rust Programing Language](https://rinthel.github.io/rust-lang-book-ko/foreword.html)
+
+Each service in the Xml file has name, ip, and port information, and a class is created using the name of the service, and functions for each service are implemented using inheritance and virtual functions.
+It create a class with the same name as the service name after parsing XML and add **adapter** function using **interface** by replacing various services like a [Plug-in](<https://en.wikipedia.org/wiki/Plug-in_(computing)>).
+
+There are several ways to implement a Rust program that parses an XML file and creates classes based on the information contained within. One approach could be to use the [TinyXML](https://github.com/leethomason/tinyxml2) library to parse the XML file and extract the service information. Then, you could create a base class for the services with virtual functions for the common functionality (e.g. name, IP, and port) and a derived class for each service with overridden virtual functions for specific functionality. You can use inheritance and polymorphism to create an object of the derived class and call its functions via the base class pointer. Finally, you can use a map or unordered_map data structure to store the objects of the derived class and retrieve them based on the service name from the XML file.
+
+1. Define a trait for the CDR types:
+
+```rust
+trait CDR {
+    fn display(&self);
+    fn get_name(&self) -> String;
+}
+```
+
+2. Define a struct for each CDR type:
+
+```rust
+struct CDRTypeA {
+    caller: String,
+    callee: String,
+    start: i64,
+    end: i64,
+    data_transferred: i64,
+}
+
+impl CDR for CDRTypeA {
+    fn display(&self) {
+        println!("Caller: {}", self.caller);
+        println!("Callee: {}", self.callee);
+        println!("Start Time: {}", self.start);
+        println!("End Time: {}", self.end);
+        println!("Data Transferred: {}", self.data_transferred);
+    }
+    fn get_name(&self) -> String {
+        "CDR Type A".to_string()
+    }
+}
+```
+
+3. Define a struct that holds a map of CDR objects and allows them to be registered and accessed by name:
+
+```rust
+struct CDRManager {
+    cdrs: HashMap<String, Box<dyn CDR>>,
+}
+
+impl CDRManager {
+    fn new() -> CDRManager {
+        CDRManager {
+            cdrs: HashMap::new(),
+        }
+    }
+
+    fn register_cdr(&mut self, name: String, cdr: Box<dyn CDR>) {
+        self.cdrs.insert(name, cdr);
+    }
+
+    fn get_cdr(&self, name: &str) -> Option<&Box<dyn CDR>> {
+        self.cdrs.get(name)
+    }
+}
+```
+
+4. In main function, you can create instances of the CDRTypeA struct and register them with the CDRManager.
+
+```rust
+fn main() {
+    let mut cdr_manager = CDRManager::new();
+    cdr_manager.register_cdr("cdr1".to_string(), Box::new(CDRTypeA {
+        caller: "Caller1".to_string(),
+        callee: "Callee1".to_string(),
+        start: time::get_time().sec,
+        end: time::get_time().sec + 60,
+        data_transferred: 1000,
+    }));
+    cdr_manager.register_cdr("cdr2".to_string(), Box::new(CDRTypeA {
+        caller: "Caller2".to_string(),
+        callee: "Callee2".to_string(),
+        start: time::get_time().sec + 120,
+        end: time::get_time().sec + 180,
+        data_transferred: 2000,
+    }));
+    if let Some(cdr) = cdr_manager.get_cdr("cdr1") {
+
+cdr.display();
+}
+```
+
+``
+
+You can use the CDRManager to access the CDR by name and display the information inside it.
+
+By following these steps, you can use the trait to replace various CDR types like a plug-in. The CDR manager struct acts as a factory that holds the CDR objects and allows them to be accessed by name, which enables you to replace the CDR objects at runtime.
+
+In Rust, Trait is used to define interface, like Java or C# interface, it defines a set of method signatures that structs can implement. Traits are similar to interfaces in other languages, and the syntax for using them is similar to that of other languages that use interfaces. Traits can be implemented by structs, enums and even other traits.
+
+## First Version
+
+Here's an example of how you might implement a Rust program that parses an XML file and creates classes with the same name as the service name, using a strategy pattern, inheritance, and interfaces:
+
+1. Include the necessary crates for XML parsing and HashMap :
+
+```rust
+use std::collections::HashMap;
+use quick_xml::{Reader, Events};
+```
+
+2. Define a trait for the services:
+
+```rust
+trait Service {
+    fn execute(&self);
+    fn get_name(&self) -> String;
+}
+```
+
+3. Define a struct for each service:
+
+```rust
+struct ServiceA {
+    name: String,
+    ip: String,
+    port: u16,
+}
+
+impl Service for ServiceA {
+    fn execute(&self) {
+        println!("ServiceA is running on {}:{}", self.ip, self.port);
+    }
+
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+}
+```
+
+4. Define a struct that holds a map of services objects and allows them to be registered and accessed by name:
+
+```rust
+struct ServiceManager {
+    services: HashMap<String, Box<dyn Service>>,
+}
+
+impl ServiceManager {
+    fn new() -> ServiceManager {
+        ServiceManager {
+            services: HashMap::new(),
+        }
+    }
+
+    fn register_service(&mut self, name: String, service: Box<dyn Service>) {
+        self.services.insert(name, service);
+    }
+
+    fn get_service(&self, name: &str) -> Option<&Box<dyn Service>> {
+        self.services.get(name)
+    }
+}
+```
+
+5. Parse the XML file and create instances of the service structs and register them with the ServiceManager:
+
+```rust
+fn parse_xml(file_name: &str, service_manager: &mut ServiceManager) {
+    let mut reader = Reader::from_file(file_name).unwrap();
+    reader.trim_text(true);
+    let mut buf = Vec::new();
+
+    let mut name = "".to_string();
+    let mut ip = "".to_string();
+    let mut port = 0;
+
+    loop {
+        match reader.read_event(&mut buf) {
+            Ok(Events::Start(ref e)) => {
+                match e.name() {
+                    b"name" => {
+                        name = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"ip" => {
+                        ip = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"port" => {
+                        port = reader.read_text(e.name(), &mut Vec::new()).unwrap().parse::<u16>().unwrap();
+                    }
+                    b"service" => {
+                        let service = ServiceA {
+                            name: name.clone(),
+                            ip: ip.clone(),
+                            port: port,
+                        };
+                        service_manager.register_service(name.clone(), Box::new(service));
+                    }
+                    _ => (),
+                }
+            }
+            Ok(Events::Eof) => break,
+            Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+            _ => (),
+        }
+        buf.clear();
+    }
+}
+```
+
+6. In the main function, create an instance of the ServiceManager and call the parse_xml function
+
+```rust
+fn main() {
+    let mut service_manager = ServiceManager::new();
+    parse_xml("services.xml", &mut service_manager);
+    let service = service_manager.get_service("service1").unwrap();
+    service.execute();
+}
+```
+
+The above code will parse the XML file and extract the service name, ip, and port information. It will then create an instance of the Service struct with the same name as the service and register it with the ServiceManager. The ServiceManager allows you to access the service by name and execute the service.
+
+## Second Version
+
+Here's an example of how you might implement the adapter function for the Service trait:
+
+```rust
+trait Service {
+    fn execute(&self);
+    fn get_name(&self) -> String;
+}
+
+struct ServiceA {
+    name: String,
+    ip: String,
+    port: u16,
+}
+
+impl Service for ServiceA {
+    fn execute(&self) {
+        println!("ServiceA is running on {}:{}", self.ip, self.port);
+    }
+
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+}
+
+struct ServiceB {
+    name: String,
+    host: String,
+    endpoint: String,
+}
+
+impl Service for ServiceB {
+    fn execute(&self) {
+        println!("ServiceB is running on {} at {}", self.host, self.endpoint);
+    }
+
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+}
+
+struct ServiceManager {
+    services: HashMap<String, Box<dyn Service>>,
+}
+
+impl ServiceManager {
+    fn new() -> ServiceManager {
+        ServiceManager {
+            services: HashMap::new(),
+        }
+    }
+
+    fn register_service(&mut self, name: String, service: Box<dyn Service>) {
+        self.services.insert(name, service);
+    }
+
+    fn get_service(&self, name: &str) -> Option<&Box<dyn Service>> {
+        self.services.get(name)
+    }
+}
+
+// Adapter struct for ServiceB
+struct ServiceBAdapter {
+    service_b: ServiceB,
+}
+
+impl Service for ServiceBAdapter {
+    fn execute(&self) {
+        println!("ServiceBAdapter is adapting ServiceB");
+        self.service_b.execute();
+    }
+
+    fn get_name(&self) -> String {
+        self.service_b.get_name()
+    }
+}
+
+fn parse_xml(file_name: &str, service_manager: &mut ServiceManager) {
+    let mut reader = Reader::from_file(file_name).unwrap();
+    reader.trim_text(true);
+    let mut buf = Vec::new();
+
+    let mut name = "".to_string();
+    let mut ip = "".to_string();
+    let mut port = 0;
+    let mut host = "".to_string();
+    let mut endpoint = "".to_string();
+    let mut service_type = "".to_string();
+
+    loop {
+        match reader.read_event(&mut buf) {
+            Ok(Events::Start(ref e)) => {
+                match e.name() {
+                    b"name" => {
+                        name = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"ip" => {
+                        ip = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"port" => {
+                        port = reader.read_text(e.name(), &mut Vec::new()).unwrap().parse::<u16>().unwrap();
+                    }
+                    b"host" => {
+                        host = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"endpoint" => {
+                        endpoint = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"type" => {
+                        service_type = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"service" => {
+                        match service_type.as_str() {
+                            "A" => {
+                                let service = ServiceA {
+                                    name: name.clone(),
+                                    ip: ip.clone(),
+                                    port: port,
+                                };
+                                service_manager.register_service(name.clone(), Box::new(service));
+                            }
+                            "B" => {
+                                let service = ServiceB {
+                                    name: name.clone(),
+                                    host: host.clone(),
+                                    endpoint: endpoint.clone(),
+                                };
+                                service_manager.register_service(name.clone(), Box::new(ServiceBAdapter { service_b: service }));
+                            }
+                            _ => (),
+                        }
+                    }
+                    _ => (),
+                }
+                Ok(Events::Eof) => break,
+                Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+                _ => (),
+            }
+            buf.clear();
+        }
+    }
+}
+
+fn main() {
+    let mut service_manager = ServiceManager::new();
+    parse_xml("services.xml", &mut service_manager);
+    let service = service_manager.get_service("service1").unwrap();
+    service.execute();
+}
+```
+
+In this example, the adapter struct, ServiceBAdapter implements the Service trait, but instead of providing its own implementation of the execute method, it wraps an instance of ServiceB and calls the execute method of the wrapped struct. This allows you to use the ServiceB struct as if it implemented the Service trait.
+
+In the parse_xml function, you can check the type of service in the xml file and create instance of ServiceA or ServiceB and wrap it with ServiceBAdapter if it's type B and register it with the ServiceManager.
+
+In this way, you can use the interface by replacing various services like a plugin and also you can use the adapter function to wrap different service implementation using the same interface.
+
+In Rust, the mut keyword is used to indicate that a variable is mutable, meaning that its value can be changed after it is created. In the line of code **`"let mut service = service_manager.get_service("service1").unwrap();"`**, the mut keyword is used to indicate that the variable service is mutable.
+
+Here, **`"service_manager.get_service("service1")"`** returns an option of **`"&Box<dyn Service>"`**, the **`".unwrap()"`** method is used to extract the value from the Option and assign it to the variable service. Since the value returned by get_service is a reference, the mut keyword is needed in order to change the value of the reference.
+
+Without mut, the variable would be immutable, and you would not be able to change its value after it has been created. This helps to ensure that data is not accidentally modified and makes it easier to reason about the code.
+
+the **'trait Service'** defines the interface for the services and the structs ServiceA and ServiceB implement that trait. The **'ServiceManager'** struct holds a map of services objects and allows them to be registered and accessed by name.
+
+This allows you to replace the service objects at runtime. By using the **'register_service'** method of the **'ServiceManager'** struct, you can register any struct that implements the Service trait, regardless of its specific implementation.
+
+For example, if you have a new service **'ServiceC'** that also implements the **'Service'** trait, you can register it with the **'ServiceManager'** just like you would register **'ServiceA'** or **'ServiceB'**.
+
+This way the **'ServiceManager'** acts as a factory that holds the service objects and allows them to be accessed by name, which enables you to replace the service objects at runtime. Like a plugin, this allows you to add new services or replace existing services without having to change the code that uses the services, making your code more flexible and easier to maintain.
+
+## Here's an example of how you might implement the parse_xml function to be more flexible.
+
+```rust
+fn parse_xml(file_name: &str, service_manager: &mut ServiceManager) {
+    let mut reader = Reader::from_file(file_name).unwrap();
+    reader.trim_text(true);
+    let mut buf = Vec::new();
+
+    let mut name = "".to_string();
+    let mut ip = "".to_string();
+    let mut port = 0;
+    let mut host = "".to_string();
+    let mut endpoint = "".to_string();
+    let mut service_type = "".to_string();
+
+    loop {
+        match reader.read_event(&mut buf) {
+            Ok(Events::Start(ref e)) => {
+                match e.name() {
+                    b"name" => {
+                        name = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"ip" => {
+                        ip = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"port" => {
+                        port = reader.read_text(e.name(), &mut Vec::new()).unwrap().parse::<u16>().unwrap();
+                    }
+                    b"host" => {
+                        host = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"endpoint" => {
+                        endpoint = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"type" => {
+                        service_type = reader.read_text(e.name(), &mut Vec::new()).unwrap();
+                    }
+                    b"service" => {
+                        match service_type.as_str() {
+                            "A" => {
+                                let service = ServiceA {
+                                    name: name.clone(),
+                                    ip: ip,
+                                    port: port,
+                                };
+                                service_manager.register_service(name.clone(), Box::new(service));
+                            }
+                            "B" => {
+                                let service = ServiceB {
+                                    name: name.clone(),
+                                    host: host.clone(),
+                                    endpoint: endpoint.clone(),
+                                };
+                                service_manager.register_service(name.clone(), Box::new(ServiceBAdapter { service_b: service }));
+                            }
+                            _ => {
+                                let service = match service_type.as_str() {
+                                    "C" => ServiceC { name: name.clone(), host: host.clone(), endpoint: endpoint.clone() },
+                                    "D" => ServiceD { name: name.clone(), host: host.clone(), endpoint: endpoint.clone() },
+                                    // Add more service types here as needed
+                                    _ => panic!("Invalid service type"),
+                                };
+                                service_manager.register_service(name.clone(), Box::new(service));
+                            }
+                        }
+                    }
+                    _ => (),
+                }
+            }
+            Ok(Events::Eof) => break,
+            Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+            _ => (),
+        }
+        buf.clear();
+    }
+}
+
+In this version of the parse_xml function, Inside the match, you can add new cases for other service types and make proper action based on the service_type.
+Also, you can use a default case that panics with an error message if an invalid service type is encountered.
+
+By doing this, you can add new service types without having to change the parse_xml function, making the code more flexible and maintainable.
+
+```

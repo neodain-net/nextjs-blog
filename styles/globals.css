@@ -15,7 +15,8 @@
   --mainColor-Light: rgb(88, 88, 143);
   --secondaryColor: #4885f7;
   --text-color: white;
-  --main-bg-color: rgba(255, 255, 255, 0.2);
+  --main-bg-color: white;
+  /* --main-bg-color: rgba(255, 255, 255, 0.2); */
 }
 
 body {

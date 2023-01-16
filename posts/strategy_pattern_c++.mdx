@@ -1,0 +1,667 @@
+---
+title: How to implement the strategy pattern in C++
+tags:
+  - language
+  - c++
+date: 2023-01-16
+excerpt: Using a strategy pattern, Let's see how to implement C++ program that parses an XML file's service information and creates classes based on the service information.
+cover_image: "/images/milky-way.jpg"
+profile_image: ""
+star_rating: 0
+weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
+---
+
+Using a [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern), Let's see how to implement C++ program that parses an [XML](https://en.wikipedia.org/wiki/XML) file's service information and creates classes based on the service information.
+Each service in the Xml file has name, ip, and port information, and a class is created using the name of the service, and functions for each service are implemented using inheritance and virtual functions.
+It create a class with the same name as the service name after parsing XML and add **'adapter'** function using **'interface'** by replacing various services like a [Plug-in](<https://en.wikipedia.org/wiki/Plug-in_(computing)>).
+
+There are several ways to implement a C++ program that parses an XML file and creates classes based on the information contained within. One approach could be to use the [TinyXML](https://github.com/leethomason/tinyxml2) library to parse the XML file and extract the service information. Then, you could create a base class for the services with virtual functions for the common functionality (e.g. name, IP, and port) and a derived class for each service with overridden virtual functions for specific functionality. You can use inheritance and polymorphism to create an object of the derived class and call its functions via the base class pointer. Finally, you can use a map or unordered_map data structure to store the objects of the derived class and retrieve them based on the service name from the XML file.
+
+## First Version
+
+1. Include the necessary libraries for XML parsing and STL data structures:
+
+```c++
+#include <iostream>
+#include <map>
+#include <string>
+#include "tinyxml2.h"
+```
+
+2. Define a base class for the services:
+
+```c++
+class Service {
+public:
+    Service(std::string name, std::string ip, int port) : name_(name), ip_(ip), port_(port) {}
+
+    virtual void display() {
+        std::cout << "Service Name: " << name_ << std::endl;
+        std::cout << "Service IP: " << ip_ << std::endl;
+        std::cout << "Service Port: " << port_ << std::endl;
+    }
+
+    std::string getName() { return name_; }
+
+private:
+    std::string name_;
+    std::string ip_;
+    int port_;
+};
+```
+
+3. Define a derived class for each service with overridden virtual functions for specific functionality:
+
+```c++
+class ServiceA : public Service {
+public:
+    ServiceA(std::string name, std::string ip, int port) : Service(name, ip, port) {}
+
+    void display() override {
+        Service::display();
+        std::cout << "Service A Specific Functionality" << std::endl;
+    }
+};
+```
+
+4. Use TinyXML to parse the XML file and extract the service information:
+
+```c++
+int main() {
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile("services.xml");
+
+    tinyxml2::XMLElement* services = doc.FirstChildElement("services");
+
+    std::map<std::string, Service*> serviceMap;
+    for (tinyxml2::XMLElement* service = services->FirstChildElement("service"); service != NULL; service = service->NextSiblingElement("service")) {
+        std::string name = service->Attribute("name");
+        std::string ip = service->Attribute("ip");
+        int port = service->IntAttribute("port");
+
+        // Create object of the derived class based on the service name
+        if (name == "ServiceA") {
+            serviceMap[name] = new ServiceA(name, ip, port);
+        }
+        else if (name == "ServiceB") {
+            serviceMap[name] = new ServiceB(name, ip, port);
+        }
+    }
+}
+```
+
+5. Finally, you can use the map or unordered_map data structure to store the objects of the derived class and retrieve them based on the service name from the XML file.
+
+```c++
+//Retrieve the service object from the map and call its display function
+serviceMap["ServiceA"]->display();
+```
+
+## Second Version
+
+1. Include the necessary libraries for XML parsing and STL data structures:
+
+```c++
+#include <iostream>
+#include <map>
+#include <string>
+#include "tinyxml2.h"
+```
+
+2. Define an interface class for the services:
+
+```c++
+class Service {
+public:
+    Service(std::string name, std::string ip, int port) : name_(name), ip_(ip), port_(port) {}
+
+    virtual void display() = 0;
+
+    std::string getName() { return name_; }
+
+private:
+    std::string name_;
+    std::string ip_;
+    int port_;
+};
+```
+
+3. Define a strategy class for each service with specific functionality:
+
+```c++
+class ServiceAStrategy : public Service {
+public:
+    ServiceAStrategy(std::string name, std::string ip, int port) : Service(name, ip, port) {}
+
+    void display() override {
+        Service::display();
+        std::cout << "Service A Specific Functionality" << std::endl;
+    }
+};
+```
+
+4. Define a context class that will hold the strategy object and call its display method:
+
+```c++
+class ServiceContext {
+public:
+    ServiceContext(Service* service) : service_(service) {}
+
+    void display() {
+        service_->display();
+    }
+
+private:
+    Service* service_;
+};
+```
+
+5. Use TinyXML to parse the XML file and extract the service information:
+
+```c++
+int main() {
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile("services.xml");
+
+    tinyxml2::XMLElement* services = doc.FirstChildElement("services");
+
+    std::map<std::string, ServiceContext*> serviceMap;
+    for (tinyxml2::XMLElement* service = services->FirstChildElement("service"); service != NULL; service = service->NextSiblingElement("service")) {
+        std::string name = service->attribute("name");
+        std::string ip = service->attribute("ip");
+        int port = service->IntAttribute("port");
+
+        // Create object of the strategy class based on the service name
+        if (name == "ServiceA") {
+            serviceMap[name] = new ServiceContext(new ServiceAStrategy(name, ip, port));
+        }
+        else if (name == "ServiceB") {
+            serviceMap[name] = new ServiceContext(new ServiceBStrategy(name, ip, port));
+        }
+    }
+}
+```
+
+6. Finally, you can use the map or unordered_map data structure to store the objects of the context class and retrieve them based on the service name from the XML file.
+
+```c++
+//Retrieve the service object from the map and call its display function
+serviceMap["ServiceA"]->display();
+```
+
+This way you can easily add new services to your system by defining a new strategy class and adding it to your XML file, without having to change any existing code.
+
+## Third Version
+
+1. You can use the **'eval'** function in C++ to create a class with the same name as the service name after parsing the XML. The **'eval'** function allows you to create a class at runtime by passing in a string containing the class definition as a parameter.
+   Here is an example:
+
+```c++
+std::string classDef = "class " + name + " : public Service { public: void display() { std::cout << \"Service " + name + " Specific Functionality\" << std::endl; } };";
+eval(classDef.c_str());
+```
+
+Here, name is the name of the service that is being parsed from the XML file.
+
+It should be noted that the eval function is not a standard C++ function and may not be available in all compilers. It is also not considered as a good practice and can introduce security vulnerabilities to your program.
+
+2. An alternative approach would be to create a factory class that maps the service name to a specific class. The factory class can have a static method that takes the service name as a parameter and returns an object of the corresponding class.
+
+```c++
+class ServiceFactory {
+public:
+    static Service* createService(std::string name, std::string ip, int port) {
+        if (name == "ServiceA") {
+            return new ServiceA(name, ip, port);
+        }
+        else if (name == "ServiceB") {
+            return new ServiceB(name, ip, port);
+        }
+        // Add more cases for other service names
+        else {
+            return nullptr;
+        }
+    }
+};
+```
+
+3. And then in your main function, you can use the factory class to create the service object
+
+```c++
+Service* service = ServiceFactory::createService(name, ip, port);
+```
+
+## Forth Version
+
+An adapter function is a function that allows an object of one class to be used as an object of another class.
+Here is an example of how you might implement an adapter function using an interface without using an if statement:
+
+1. Define an interface class for the services:
+
+```c++
+class Service {
+public:
+    Service(std::string name, std::string ip, int port) : name_(name), ip_(ip), port_(port) {}
+
+    virtual void display() = 0;
+    std::string getName() { return name_; }
+
+private:
+    std::string name_;
+    std::string ip_;
+    int port_;
+};
+```
+
+2. Define a concrete class for each service:
+
+```c++
+class ConcreteServiceA : public Service {
+public:
+    ConcreteServiceA(std::string name, std::string ip, int port) : Service(name, ip, port) {}
+
+    void display() override {
+        std::cout << "Concrete Service A: " << getName() << std::endl;
+    }
+};
+```
+
+3. Define an adapter class that implements the interface and wraps the concrete class:
+
+```c++
+class ServiceAdapter : public Service {
+public:
+    ServiceAdapter(std::string name, std::string ip, int port, ConcreteServiceA* concreteService) : Service(name, ip, port), concreteService_(concreteService) {}
+
+    void display() override {
+        concreteService_->display();
+    }
+
+private:
+    ConcreteServiceA* concreteService_;
+};
+```
+
+4. Use TinyXML to parse the XML file and extract the service information:
+
+```c++
+int main() {
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile("services.xml");
+
+    tinyxml2::XMLElement* services = doc.FirstChildElement("services");
+
+    std::map<std::string, Service*> serviceMap;
+    for (tinyxml2::XMLElement* service = services->FirstChildElement("service"); service != NULL; service = service->NextSiblingElement("service")) {
+        std::string name = service->attribute("name");
+        std::string ip = service->attribute("ip");
+        int port = service->IntAttribute("port");
+
+        // Create an object of the adapter class that wraps the concrete class
+        if (name == "ConcreteServiceA") {
+            serviceMap[name] = new ServiceAdapter(name, ip, port, new ConcreteServiceA(name, ip, port));
+        }
+    }
+}
+```
+
+5. Finally, you can use the map or unordered_map data structure to store the objects of the adapter class and retrieve them based on the service name from the XML file.
+
+```c++
+//Retrieve the service object from the map and call its display function
+serviceMap["ConcreteServiceA"]->display();
+```
+
+This way, you can use the adapter class to adapt the ConcreteServiceA class to the Service interface without using any if statement.
+
+## Fifth Version
+
+You can use the strategy pattern to implement a plug-in mechanism where you can replace various services using the interface.
+Here is an example of how you might implement a C++ program that uses a plug-in mechanism where you can replace various services using the interface:
+
+1. Include the necessary libraries for STL data structures:
+
+```c++
+#include <iostream>
+#include <string>
+#include <map>
+```
+
+2. Define an interface class for the services:
+
+```c++
+class Service {
+public:
+    virtual ~Service() {}
+    virtual void display() = 0;
+};
+```
+
+3. Define a concrete class for each service:
+
+```c++
+class ConcreteServiceA : public Service {
+public:
+    void display() override {
+        std::cout << "Concrete Service A" << std::endl;
+    }
+};
+```
+
+4. Define a class that holds a map of service objects and allows them to be registered and accessed by name:
+
+```c++
+class ServiceManager {
+public:
+    Service* getService(std::string name) {
+        return services_[name];
+    }
+
+    void registerService(std::string name, Service* service) {
+        services_[name] = service;
+    }
+
+private:
+    std::map<std::string, Service*> services_;
+};
+```
+
+5. In main function, you can register the concrete service object with the service manager by name.
+
+```c++
+int main() {
+    ServiceManager serviceManager;
+    serviceManager.registerService("ConcreteServiceA", new ConcreteServiceA());
+}
+```
+
+6. you can use the service manager to access the service by name.
+
+```c++
+serviceManager.getService("ConcreteServiceA")->display();
+```
+
+This way, you can easily add new services to your system by creating new concrete service classes and registering them with the service manager, without having to change any existing code. Additionally, you can swap out services at runtime by registering new service objects with the same name.
+
+By using this approach, you can use the interface to replace various services like a plug-in. The service manager acts as a factory that creates the service objects and allows them to be accessed by name, which enables you to replace the service objects at runtime.
+
+## Last Version
+
+Here is an example of how you might implement a C++ program that uses a plug-in mechanism where you can replace various services using the interface in more detail:
+
+1. Include the necessary libraries for dynamic loading and STL data structures:
+
+```c++
+#include <iostream>
+#include <string>
+#include <map>
+#include <dlfcn.h>
+```
+
+2. Define an interface class for the services:
+
+```c++
+class Service {
+public:
+    virtual ~Service() {}
+    virtual void display() = 0;
+    virtual std::string getName() = 0;
+};
+```
+
+3. Define a class that holds a map of service objects and allows them to be registered and accessed by name:
+
+```c++
+class ServiceManager {
+public:
+    Service* getService(std::string name) {
+        return services_[name];
+    }
+
+    void registerService(std::string name, Service* service) {
+        services_[name] = service;
+    }
+
+    void loadService(std::string name, std::string path) {
+        void* handle = dlopen(path.c_str(), RTLD_LAZY);
+        if (!handle) {
+            std::cerr << "Error loading service: " << dlerror() << std::endl;
+            return;
+        }
+
+        create_t* create = (create_t*) dlsym(handle, "create");
+        if (!create) {
+            std::cerr << "Error loading service: " << dlerror() << std::endl;
+            dlclose(handle);
+            return;
+        }
+
+        destroy_t* destroy = (destroy_t*) dlsym(handle, "destroy");
+        if (!destroy) {
+            std::cerr << "Error loading service: " << dlerror() << std::endl;
+            dlclose(handle);
+            return;
+        }
+
+        Service* service = create();
+        service->setName(name);
+        registerService(name, service);
+
+        destroy_functions_[name] = destroy;
+    }
+
+    void unloadService(std::string name) {
+        destroy_t* destroy = destroy_functions_[name];
+        destroy(services_[name]);
+        services_.erase(name);
+        destroy_functions_.erase(name);
+    }
+
+private:
+    std::map<std::string, Service*> services_;
+    std::map<std::string, destroy_t*> destroy_functions_;
+};
+```
+
+In the loadService function, the dlopen function is used to open the shared library at the specified path. The dlsym function is then used to retrieve the create and destroy functions from the library, which are used to create and destroy the service objects.
+
+4. In the main function, you can register the service object with the service manager by loading the shared library and calling the create function.
+
+```c++
+int main() {
+    ServiceManager serviceManager;
+    serviceManager.loadService("ConcreteServiceA", "libconcreteservicea.so");
+}
+```
+
+5. You can use the service manager to access the service by name.
+
+```c++
+serviceManager.getService("ConcreteServiceA")->display();
+```
+
+6. When you no longer need the service, you can unload it by calling the unloadService function.
+
+```c++
+serviceManager.unloadService("ConcreteServiceA");
+```
+
+This way, you can easily add new services to your system by creating new shared libraries that implement the Service interface and loading them with the service manager, without having to change any existing code. Additionally, you can unload and replace services at runtime by loading new shared libraries with the same name.
+
+By using this approach, you can use the interface to replace various services like a plug-in. The service manager acts as a factory that loads the shared libraries and creates the service objects, and allows them to be accessed by name, which enables you to replace the service objects at runtime.
+
+You will need to implement the create and destroy function in each library that you want to use it as a plugin and make sure they match the signature defined in the ServiceManager class.
+
+7. loadService function : `void loadService(std::string name, std::string path) {}`
+   This function is used to load a shared library at the specified path and create an instance of the service class implemented in the shared library. The **'dlopen'** function is used to open the shared library and **'dlsym'** is used to retrieve the address of the create and destroy functions from the library.
+   The create function is then called to create an instance of the service class, which is registered with the **'service manager'** using the name passed as an argument. The address of the destroy function is also stored in a map so that it can be used to unload the service later.
+
+## 3GPP Charging CDR
+
+it is possible to implement the above functions as a service according to the 3GPP Charging CDR (Call Data Record) type.
+
+The 3GPP Charging CDR is a data record that contains information about a call or session, such as the start and end time, the identity of the caller and callee, and the amount of data transferred.
+
+To implement the above functions as a service according to the 3GPP Charging CDR type, you would need to:
+
+1. Define a class or struct that holds the information in a 3GPP Charging CDR. This class could include fields such as start time, end time, caller identity, callee identity, and data transferred.
+
+```c++
+class ChargingCDR {
+public:
+    ChargingCDR(std::string caller, std::string callee, std::time_t start, std::time_t end, long dataTransferred)
+        : caller_(caller), callee_(callee), start_(start), end_(end), dataTransferred_(dataTransferred) {}
+    std::string getCaller() { return caller_; }
+    std::string getCallee() { return callee_; }
+    std::time_t getStartTime() { return start_; }
+    std::time_t getEndTime() { return end_; }
+    long getDataTransferred() { return dataTransferred_; }
+
+private:
+    std::string caller_;
+    std::string callee_;
+    std::time_t start_;
+    std::time_t end_;
+    long dataTransferred_;
+};
+```
+
+2. Modify the service manager class to handle the Charging CDR class instead of the Service class.
+
+```c++
+class CDRManager {
+public:
+    ChargingCDR* getCDR(std::string name) {
+        return cdrs_[name];
+    }
+
+    void registerCDR(std::string name, ChargingCDR* cdr) {
+        cdrs_[name] = cdr;
+    }
+
+private:
+    std::map<std::string, ChargingCDR*> cdrs_;
+};
+```
+
+3. Modify the main function to create instances of the ChargingCDR class and register them with the CDRManager instead of the Service class.
+
+```c++
+int main() {
+    CDRManager cdrManager;
+    cdrManager.registerCDR("cdr1", new ChargingCDR("Caller1", "Callee1", time(0), time(0) + 60, 1000));
+    cdrManager.registerCDR("cdr2", new ChargingCDR("Caller2", "Callee2", time(0) + 120, time(0) + 180, 2000));
+}
+```
+
+4. You can use the CDRManager to access the CDR by name and retrieve the information inside it
+
+```c++
+ChargingCDR* cdr = cdrManager.getCDR("cdr1");
+std::cout << "Caller: " << cdr->getCaller() << std::endl;
+std::cout << "Callee: " << cdr->getCallee() << std::endl;
+std::cout << "Start Time: " << cdr->getStartTime() << std::endl;
+std::cout << "End Time: " << cdr->getEndTime() << std::endl;
+std::cout << "Data Transferred: " << cdr->getDataTransferred() << std::endl;
+```
+
+5. You could also add additional functionality to the CDRManager class like writing CDR to a file, sending CDR to a remote server, or additional fields to the ChargingCDR class.
+
+## Use the strategy pattern to implement a plug-in mechanism
+
+In addition to, You can use the strategy pattern to implement a plug-in mechanism where you can replace various CDR types using the interface.
+
+Here is an example of how you might implement a C++ program that uses a plug-in mechanism where you can replace various CDR types using the interface:
+
+1. Include the necessary libraries for STL data structures:
+
+```c++
+#include <iostream>
+#include <string>
+#include <map>
+```
+
+2. Define an interface class for the CDR types:
+
+```c++
+class CDR {
+public:
+    virtual ~CDR() {}
+    virtual void display() = 0;
+    virtual std::string getName() = 0;
+};
+```
+
+3. Define a concrete class for each CDR type:
+
+```c++
+class CDRTypeA : public CDR {
+public:
+    CDRTypeA(std::string caller, std::string callee, std::time_t start, std::time_t end, long dataTransferred)
+        : caller_(caller), callee_(callee), start_(start), end_(end), dataTransferred_(dataTransferred) {}
+    std::string getCaller() { return caller_; }
+    std::string getCallee() { return callee_; }
+    std::time_t getStartTime() { return start_; }
+    std::time_t getEndTime() { return end_; }
+    long getDataTransferred() { return dataTransferred_; }
+    void display() override {
+        std::cout << "Caller: " << caller_ << std::endl;
+        std::cout << "Callee: " << callee_ << std::endl;
+        std::cout << "Start Time: " << start_ << std::endl;
+        std::cout << "End Time: " << end_ << std::endl;
+        std::cout << "Data Transferred: " << dataTransferred_ << std::endl;
+    }
+    std::string getName() override{ return "CDR Type A";}
+private:
+    std::string caller_;
+    std::string callee_;
+    std::time_t start_;
+    std::time_t end_;
+    long dataTransferred_;
+};
+```
+
+4. Define a class that holds a map of CDR objects and allows them to be registered and accessed by name:
+
+```c++
+class CDRManager {
+public:
+    CDR* getCDR(std::string name) {
+        return cdrs_[name];
+    }
+
+    void registerCDR(std::string name, CDR* cdr) {
+        cdrs_[name] = cdr;
+    }
+
+private:
+    std::map<std::string, CDR*> cdrs_;
+};
+```
+
+5. In main function, you can register the concrete CDR object with the CDR manager by name.
+
+```c++
+int main() {
+    CDRManager cdrManager;
+    cdrManager.registerCDR("cdr1", new CDRTypeA("Caller1", "Callee1", time(0), time(0) + 60, 1000));
+    cdrManager.registerCDR("cdr2", new CDRTypeB("Caller2", "Callee2", time(0) + 120, time(0) + 180, 2000));
+    cdrManager.registerCDR("cdr3", new CDRTypeC("Caller3", "Callee3", time(0) + 240, time(0) + 300, 3000));
+    CDR* cdr = cdrManager.getCDR("cdr1");
+    cdr->display();
+}
+```
+
+You can use the CDRManager to access the CDR by name and display the information inside it
+
+You could also add additional functionality to the CDRManager class like writing CDR to a file, sending CDR to a remote server, or additional fields to the CDRTypeA class.
+This way, you can easily add new CDR types to your system by creating new concrete CDR classes that implement the CDR interface and registering them with the CDRManager, without having to change any existing code. Additionally, you can replace CDR types at runtime by registering new concrete CDR classes with the same name.
+
+By using this approach, you can use the interface to replace various CDR types like a plug-in.
+The CDR manager acts as a factory that holds the CDR objects and allows them to be accessed by name, which enables you to replace the CDR objects at runtime.
+
+In this example, instances of different CDR types like CDRTypeA, CDRTypeB and CDRTypeC are created and registered with the CDRManager class.
+The CDRManager class holds a map of CDR objects and allows them to be accessed by name.
+
+In the main function, you can see how the CDR objects are being registered by providing the object name (cdr1, cdr2, cdr3) and the corresponding object.
+And you can use the CDRManager to access the CDR by name and display the information inside it using the display() function of the CDR interface.
