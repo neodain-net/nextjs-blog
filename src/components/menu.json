@@ -1,0 +1,55 @@
+{
+  "items": [
+    {
+      "title": "Life",
+      "link": "/life",
+      "subItems": [
+        { "title": "Food", "link": "/life/food" },
+        { "title": "Fashion", "link": "/life/fashion" },
+        { "title": "Travel", "link": "/life/travel" },
+        { "title": "Movie", "link": "/life/movie" },
+        { "title": "Music", "link": "/life/music" },
+        { "title": "Youtube", "link": "/life/youtube" }
+      ]
+    },
+    {
+      "title": "Trend",
+      "link": "/trend",
+      "subItems": [
+        { "title": "IT/Tech", "link": "/trend/tech" },
+        { "title": "AI", "link": "/trend/ai" },
+        { "title": "Front-End", "link": "/trend/front" },
+        { "title": "Back-End", "link": "/trend/back" },
+        { "title": "DataBase", "link": "/trend/database" }
+      ]
+    },
+    {
+      "title": "Language",
+      "link": "/language",
+      "subItems": [
+        { "title": "C/C++", "link": "/language/c_c++" },
+        { "title": "Java", "link": "/language/java" },
+        { "title": "Python", "link": "/language/python" },
+        { "title": "Javascript", "link": "/language/javascript" },
+        { "title": "Typescript", "link": "/language/typescript" },
+        { "title": "HTML/CSS", "link": "/language/html_css" },
+        { "title": "Rust", "link": "/language/rust" }
+      ]
+    },
+    {
+      "title": "Gallery",
+      "link": "/gallery",
+      "subItems": [
+        { "title": "Photo", "link": "/gallery/photo" },
+        { "title": "Image", "link": "/gallery/image" },
+        { "title": "Art", "link": "/gallery/art" },
+        { "title": "Design", "link": "/gallery/design" },
+        { "title": "Collection", "link": "/gallery/collect" }
+      ]
+    },
+    {
+      "title": "About",
+      "link": "/about"
+    }
+  ]
+}
