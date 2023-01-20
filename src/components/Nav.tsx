@@ -50,13 +50,7 @@ export default function Nav() {
         </div>
       </div>
 
-      <div
-        className={
-          mobileMenu && window.innerWidth <= mediaSize
-            ? "mobile-menu"
-            : "navi-menu"
-        }
-      >
+      <div className={mobileMenu ? "mobile-menu" : "navi-menu"}>
         <ul className="menu-list">
           {items.map((item: Items, index: number) => {
             return (
