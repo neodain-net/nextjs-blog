@@ -20,6 +20,7 @@ interface Props {
 export default function Nav() {
   const [mobileMenu, setmobileMenu] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const mediaSize = 950;
 
   const handleClick = (index: number) => {
     console.log(`openIndex : ${openIndex}, index=${index}`);
@@ -49,7 +50,13 @@ export default function Nav() {
         </div>
       </div>
 
-      <div className={mobileMenu ? "mobile-menu" : "navi-menu"}>
+      <div
+        className={
+          mobileMenu && window.innerWidth <= mediaSize
+            ? "mobile-menu"
+            : "navi-menu"
+        }
+      >
         <ul className="menu-list">
           {items.map((item: Items, index: number) => {
             return (
