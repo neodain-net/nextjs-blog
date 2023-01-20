@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { getAllPosts, PostMeta } from "@/src/api";
+
 import Articles from "@/src/components/Articles";
 
 export default function Home({ posts }: { posts: PostMeta[] }) {
