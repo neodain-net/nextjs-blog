@@ -11,107 +11,20 @@ star_rating: 0
 weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
 ---
 
-This is NextJS Markdown page test.
+## Purpose
 
 Using a [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern), Let's see how to implement [Rust](https://doc.rust-lang.org/book/title-page.html) program that parses an [XML](https://en.wikipedia.org/wiki/XML) file's service information and creates classes based on the service information.
 
 - Korean Reference : [The Rust Programing Language](https://rinthel.github.io/rust-lang-book-ko/foreword.html)
 
+## Concept
+
 Each service in the Xml file has name, ip, and port information, and a class is created using the name of the service, and functions for each service are implemented using inheritance and virtual functions.
 It create a class with the same name as the service name after parsing XML and add **adapter** function using **interface** by replacing various services like a [Plug-in](<https://en.wikipedia.org/wiki/Plug-in_(computing)>).
 
+## Guide
+
 There are several ways to implement a Rust program that parses an XML file and creates classes based on the information contained within. One approach could be to use the [TinyXML](https://github.com/leethomason/tinyxml2) library to parse the XML file and extract the service information. Then, you could create a base class for the services with virtual functions for the common functionality (e.g. name, IP, and port) and a derived class for each service with overridden virtual functions for specific functionality. You can use inheritance and polymorphism to create an object of the derived class and call its functions via the base class pointer. Finally, you can use a map or unordered_map data structure to store the objects of the derived class and retrieve them based on the service name from the XML file.
-
-1. Define a trait for the CDR types:
-
-```rust
-trait CDR {
-    fn display(&self);
-    fn get_name(&self) -> String;
-}
-```
-
-2. Define a struct for each CDR type:
-
-```rust
-struct CDRTypeA {
-    caller: String,
-    callee: String,
-    start: i64,
-    end: i64,
-    data_transferred: i64,
-}
-
-impl CDR for CDRTypeA {
-    fn display(&self) {
-        println!("Caller: {}", self.caller);
-        println!("Callee: {}", self.callee);
-        println!("Start Time: {}", self.start);
-        println!("End Time: {}", self.end);
-        println!("Data Transferred: {}", self.data_transferred);
-    }
-    fn get_name(&self) -> String {
-        "CDR Type A".to_string()
-    }
-}
-```
-
-3. Define a struct that holds a map of CDR objects and allows them to be registered and accessed by name:
-
-```rust
-struct CDRManager {
-    cdrs: HashMap<String, Box<dyn CDR>>,
-}
-
-impl CDRManager {
-    fn new() -> CDRManager {
-        CDRManager {
-            cdrs: HashMap::new(),
-        }
-    }
-
-    fn register_cdr(&mut self, name: String, cdr: Box<dyn CDR>) {
-        self.cdrs.insert(name, cdr);
-    }
-
-    fn get_cdr(&self, name: &str) -> Option<&Box<dyn CDR>> {
-        self.cdrs.get(name)
-    }
-}
-```
-
-4. In main function, you can create instances of the CDRTypeA struct and register them with the CDRManager.
-
-```rust
-fn main() {
-    let mut cdr_manager = CDRManager::new();
-    cdr_manager.register_cdr("cdr1".to_string(), Box::new(CDRTypeA {
-        caller: "Caller1".to_string(),
-        callee: "Callee1".to_string(),
-        start: time::get_time().sec,
-        end: time::get_time().sec + 60,
-        data_transferred: 1000,
-    }));
-    cdr_manager.register_cdr("cdr2".to_string(), Box::new(CDRTypeA {
-        caller: "Caller2".to_string(),
-        callee: "Callee2".to_string(),
-        start: time::get_time().sec + 120,
-        end: time::get_time().sec + 180,
-        data_transferred: 2000,
-    }));
-    if let Some(cdr) = cdr_manager.get_cdr("cdr1") {
-
-cdr.display();
-}
-```
-
-``
-
-You can use the CDRManager to access the CDR by name and display the information inside it.
-
-By following these steps, you can use the trait to replace various CDR types like a plug-in. The CDR manager struct acts as a factory that holds the CDR objects and allows them to be accessed by name, which enables you to replace the CDR objects at runtime.
-
-In Rust, Trait is used to define interface, like Java or C# interface, it defines a set of method signatures that structs can implement. Traits are similar to interfaces in other languages, and the syntax for using them is similar to that of other languages that use interfaces. Traits can be implemented by structs, enums and even other traits.
 
 ## First Version
 
@@ -393,9 +306,9 @@ In the parse_xml function, you can check the type of service in the xml file and
 
 In this way, you can use the interface by replacing various services like a plugin and also you can use the adapter function to wrap different service implementation using the same interface.
 
-In Rust, the mut keyword is used to indicate that a variable is mutable, meaning that its value can be changed after it is created. In the line of code **`"let mut service = service_manager.get_service("service1").unwrap();"`**, the mut keyword is used to indicate that the variable service is mutable.
+In Rust, the mut keyword is used to indicate that a variable is mutable, meaning that its value can be changed after it is created. In the line of code **let mut service =** **service_manager** . **get_service("service1")** . **unwrap();**, the mut keyword is used to indicate that the variable service is mutable.
 
-Here, **`"service_manager.get_service("service1")"`** returns an option of **`"&Box<dyn Service>"`**, the **`".unwrap()"`** method is used to extract the value from the Option and assign it to the variable service. Since the value returned by get_service is a reference, the mut keyword is needed in order to change the value of the reference.
+Here, **service_manager** . **get_service("service1")** **returns an option of** **&Box<dyn Service>**, the **.unwrap()** method is used to extract the value from the Option and assign it to the variable service. Since the value returned by get_service is a reference, the mut keyword is needed in order to change the value of the reference.
 
 Without mut, the variable would be immutable, and you would not be able to change its value after it has been created. This helps to ensure that data is not accidentally modified and makes it easier to reason about the code.
 
@@ -490,3 +403,96 @@ Also, you can use a default case that panics with an error message if an invalid
 By doing this, you can add new service types without having to change the parse_xml function, making the code more flexible and maintainable.
 
 ```
+
+## Example of using Rust
+
+1. Define a trait for the CDR types:
+
+```rust
+trait CDR {
+    fn display(&self);
+    fn get_name(&self) -> String;
+}
+```
+
+2. Define a struct for each CDR type:
+
+```rust
+struct CDRTypeA {
+    caller: String,
+    callee: String,
+    start: i64,
+    end: i64,
+    data_transferred: i64,
+}
+
+impl CDR for CDRTypeA {
+    fn display(&self) {
+        println!("Caller: {}", self.caller);
+        println!("Callee: {}", self.callee);
+        println!("Start Time: {}", self.start);
+        println!("End Time: {}", self.end);
+        println!("Data Transferred: {}", self.data_transferred);
+    }
+    fn get_name(&self) -> String {
+        "CDR Type A".to_string()
+    }
+}
+```
+
+3. Define a struct that holds a map of CDR objects and allows them to be registered and accessed by name:
+
+```rust
+struct CDRManager {
+    cdrs: HashMap<String, Box<dyn CDR>>,
+}
+
+impl CDRManager {
+    fn new() -> CDRManager {
+        CDRManager {
+            cdrs: HashMap::new(),
+        }
+    }
+
+    fn register_cdr(&mut self, name: String, cdr: Box<dyn CDR>) {
+        self.cdrs.insert(name, cdr);
+    }
+
+    fn get_cdr(&self, name: &str) -> Option<&Box<dyn CDR>> {
+        self.cdrs.get(name)
+    }
+}
+```
+
+4. In main function, you can create instances of the CDRTypeA struct and register them with the CDRManager.
+
+```rust
+fn main() {
+    let mut cdr_manager = CDRManager::new();
+    cdr_manager.register_cdr("cdr1".to_string(), Box::new(CDRTypeA {
+        caller: "Caller1".to_string(),
+        callee: "Callee1".to_string(),
+        start: time::get_time().sec,
+        end: time::get_time().sec + 60,
+        data_transferred: 1000,
+    }));
+    cdr_manager.register_cdr("cdr2".to_string(), Box::new(CDRTypeA {
+        caller: "Caller2".to_string(),
+        callee: "Callee2".to_string(),
+        start: time::get_time().sec + 120,
+        end: time::get_time().sec + 180,
+        data_transferred: 2000,
+    }));
+    if let Some(cdr) = cdr_manager.get_cdr("cdr1") {
+
+cdr.display();
+}
+```
+
+``
+
+You can use the CDRManager to access the CDR by name and display the information inside it.
+
+By following these steps, you can use the trait to replace various CDR types like a plug-in. The CDR manager struct acts as a factory that holds the CDR objects and allows them to be accessed by name, which enables you to replace the CDR objects at runtime.
+
+In Rust, Trait is used to define interface, like Java or C# interface, it defines a set of method signatures that structs can implement. Traits are similar to interfaces in other languages, and the syntax for using them is similar to that of other languages that use interfaces. Traits can be implemented by structs, enums and even other traits.

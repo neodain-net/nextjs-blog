@@ -1,5 +1,5 @@
 ---
-title: How to use GPU based Scream DB
+title: How to use GPU based Scream DB with Python
 tags:
   - database
   - sqream
@@ -13,7 +13,7 @@ star_rating: 0
 weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
 ---
 
-[ScreamDB](https://www.sqream.com/) is a database system that uses a GPU (graphics processing unit) to accelerate database operations. It is designed to be used with Python code and can be integrated into a Python application using the Python bindings provided by the ScreamDB project.
+[ScreamDB](https://www.sqream.com/) is a database system that uses a GPU (graphics processing unit) to accelerate database operations.
 
 To use ScreamDB with Python, you will need to install the ScreamDB Python bindings and then import the screamdb module in your Python code. You can then use the screamdb module to connect to the database and perform various database operations, such as inserting and querying data.
 
@@ -195,10 +195,9 @@ except Exception as e:
 conn.close()
 ```
 
-## Question
+## Etc
 
-A problem in which a specific worker does not operate (a problem in which the daemon dies) occurred while operating the SQreamDB server.
-What is the pointers to be checked and solutions when the problem occurs ?
+What is the pointers to be checked and solutions when a problem in which a specific SQreamDB's worker does not operate ?
 
 There are a few things you can check if you are experiencing issues with a specific worker not operating in SQreamDB:
 
@@ -209,5 +208,3 @@ There are a few things you can check if you are experiencing issues with a speci
 - Check the configuration: Make sure that the configuration of the worker is correct. This includes the number of worker threads, the amount of memory allocated to the worker, and any other relevant settings.
 
 - Restart the worker: If all else fails, you may need to try restarting the worker. To do this, you can use the '**sqreamd**' command with the '**--restart flag**'. For example: '**sqreamd --restart worker1**'.
-
-If none of these steps help to resolve the issue, you may need to seek further assistance from SQreamDB support or a qualified system administrator.

@@ -11,11 +11,16 @@ star_rating: 0
 weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
 ---
 
-This is NextJS markdown page test.
+## Purpose
 
 Using a [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern), Let's see how to implement C++ program that parses an [XML](https://en.wikipedia.org/wiki/XML) file's service information and creates classes based on the service information.
 Each service in the Xml file has name, ip, and port information, and a class is created using the name of the service, and functions for each service are implemented using inheritance and virtual functions.
+
+## Concept
+
 It create a class with the same name as the service name after parsing XML and add **'adapter'** function using **'interface'** by replacing various services like a [Plug-in](<https://en.wikipedia.org/wiki/Plug-in_(computing)>).
+
+## Guide
 
 There are several ways to implement a C++ program that parses an XML file and creates classes based on the information contained within. One approach could be to use the [TinyXML](https://github.com/leethomason/tinyxml2) library to parse the XML file and extract the service information. Then, you could create a base class for the services with virtual functions for the common functionality (e.g. name, IP, and port) and a derived class for each service with overridden virtual functions for specific functionality. You can use inheritance and polymorphism to create an object of the derived class and call its functions via the base class pointer. Finally, you can use a map or unordered_map data structure to store the objects of the derived class and retrieve them based on the service name from the XML file.
 
