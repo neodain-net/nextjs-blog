@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { PostMeta } from "@/src/api";
-import styles from "@/styles/Articles.module.css";
+import styles from "@/styles/articles.module.css";
 
 export default function Articles({ posts }: { posts: PostMeta[] }) {
   return (
