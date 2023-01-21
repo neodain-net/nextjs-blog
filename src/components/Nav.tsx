@@ -32,10 +32,10 @@ export default function Nav() {
   };
 
   // This function will be triggered when the mouse pointer is over the box
-  const boxMouseOverHandler = (event: React.MouseEvent<HTMLDivElement>) => {
-    const box: HTMLDivElement = event.currentTarget;
-    box.style.backgroundColor = "lightblue";
-  };
+  // const boxMouseOverHandler = (event: React.MouseEvent<HTMLDivElement>) => {
+  //   const box: HTMLDivElement = event.currentTarget;
+  //   box.style.backgroundColor = "lightblue";
+  // };
 
   return (
     <div className="navi-container">
