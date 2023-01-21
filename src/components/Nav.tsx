@@ -13,9 +13,9 @@ interface Items {
   subItems?: Array<Items>;
 }
 
-interface Props {
-  items: Array<Items>;
-}
+// interface Props {
+//   items: Array<Items>;
+// }
 
 export default function Nav() {
   const [mobileMenu, setmobileMenu] = useState(false);
