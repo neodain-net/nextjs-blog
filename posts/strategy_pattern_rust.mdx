@@ -308,7 +308,7 @@ In this way, you can use the interface by replacing various services like a plug
 
 In Rust, the mut keyword is used to indicate that a variable is mutable, meaning that its value can be changed after it is created. In the line of code **let mut service =** **service_manager** . **get_service("service1")** . **unwrap();**, the mut keyword is used to indicate that the variable service is mutable.
 
-Here, **service_manager** . **get_service("service1")** **returns an option of** **&Box<dyn Service>**, the **.unwrap()** method is used to extract the value from the Option and assign it to the variable service. Since the value returned by get_service is a reference, the mut keyword is needed in order to change the value of the reference.
+Here, **service_manager** . **get_service("service1")** **returns an option of** **`&Box<dyn Service>`**, the **`.unwrap()`** method is used to extract the value from the Option and assign it to the variable service. Since the value returned by get_service is a reference, the mut keyword is needed in order to change the value of the reference.
 
 Without mut, the variable would be immutable, and you would not be able to change its value after it has been created. This helps to ensure that data is not accidentally modified and makes it easier to reason about the code.
 
