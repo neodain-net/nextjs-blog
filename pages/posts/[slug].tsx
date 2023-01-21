@@ -7,7 +7,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeHighlight from "rehype-highlight";
 import { getPostFromSlug, getSlugs, PostMeta } from "@/src/api";
-import Youtube from "@/src/components/youtube";
+import Youtube from "@/src/components/Youtube";
 import "highlight.js/styles/atom-one-dark.css";
 
 interface MDXPost {
