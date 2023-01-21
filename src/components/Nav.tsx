@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { HamburgIcon, LogoIcon, MoonIcon } from "./assets/Icons";
+import { HamburgIcon, LogoIcon, MoonIcon } from "@/src/components/assets/icons";
 // import { FaBars, FaTimes } from "react-icons/fa"
 import Link from "next/link";
 import * as data from "./menu.json";
