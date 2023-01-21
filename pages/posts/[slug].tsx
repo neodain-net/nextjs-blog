@@ -7,7 +7,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeHighlight from "rehype-highlight";
 import { getPostFromSlug, getSlugs, PostMeta } from "@/src/api";
-import Youtube from "@/src/components/Youtube";
+import YouTube from "@/src/components/YouTube";
 import "highlight.js/styles/atom-one-dark.css";
 
 interface MDXPost {
@@ -22,7 +22,7 @@ export default function PostPage({ post }: { post: MDXPost }) {
         <title>{post.meta.title}</title>
       </Head>
       <h1>{post.meta.title}</h1>
-      <MDXRemote {...post.source} components={{ Youtube, Image }} />
+      <MDXRemote {...post.source} components={{ YouTube, Image }} />
     </>
   );
 }
