@@ -1,0 +1,217 @@
+---
+title: How to make searching in input box with React & Typescript
+tags:
+  - language
+  - typescript
+  - react
+date: 2023-01-22
+excerpt: Learning how to make searching in input box with React & Typescript
+cover_image: "/images/img5.jpg"
+profile_image: ""
+star_rating: 0
+weather: Hot/Warm, Cold/Cool, Sunny/Rainy, Clear/Cloudy, Dry/Humid, Foggy/Misty, Gusty/Windy, Thunder/Lightning
+---
+
+## Purpose
+
+Learning how to make searching in input box with React & Typescript
+
+## Concept
+
+The component accepts a prop called text, which is a string containing the text to be searched. When the user submits the form, the component splits the text into words and filters the words that include the search term. The filtered words are then displayed in a list below the form.
+
+## Guide
+
+1. Create a new React component called SearchInput:
+2. In the parent component, you can use the SearchInput component and pass a callback function to the onSearch prop. This function will be called when the user submits the form with the search term:
+
+## Implementation - 1
+
+1. Create a new React component called SearchInput:
+
+```typescript
+import React, { useState } from "react";
+
+interface Props {
+  onSearch: (searchTerm: string) => void;
+}
+
+const SearchInput: React.FC<Props> = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onSearch(searchTerm);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+      <button type="submit">Search</button>
+    </form>
+  );
+};
+
+export default SearchInput;
+```
+
+2. In the parent component, you can use the SearchInput component and pass a callback function to the onSearch prop. This function will be called when the user submits the form with the search term:
+
+```typescript
+import SearchInput from "./SearchInput";
+
+const ParentComponent: React.FC = () => {
+  const handleSearch = (searchTerm: string) => {
+    console.log(`Searching for: ${searchTerm}`);
+    // perform the search here and update the state
+  };
+
+  return <SearchInput onSearch={handleSearch} />;
+};
+```
+
+## Implementation - 2
+
+```typescript
+import React, { useState } from "react";
+
+interface Props {
+  text: string;
+}
+
+const Search: React.FC<Props> = ({ text }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const words = text.split(" ");
+    const results = words.filter((word) => word.includes(searchTerm));
+    setSearchResults(results);
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Search for a word..."
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <button type="submit">Search</button>
+      </form>
+      <div>
+        {searchResults.map((result, index) => (
+          <div key={index}>{result}</div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Search;
+```
+
+In this example, the component accepts a prop called text, which is a string containing the text to be searched. When the user submits the form, the component splits the text into words and filters the words that include the search term. The filtered words are then displayed in a list below the form.
+
+## Implementation - 3
+
+```typescript
+import React, { useState } from "react";
+
+interface Props {
+  text: string;
+}
+
+const Search: React.FC<Props> = ({ text }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [message, setMessage] = useState("");
+  const [searchNotFound, setSearchNotFound] = useState(false);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setSearchNotFound(false);
+    setSearchResults([]);
+    setMessage("");
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (searchTerm.length === 0) {
+      setMessage("Enter a word to search");
+      return;
+    }
+    setIsSearching(true);
+    setSearchNotFound(false);
+    setMessage("Searching...");
+    const words = text.split(/\s+/);
+    const results = words.filter((word) =>
+      word.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    if (results.length === 0) {
+      setSearchNotFound(true);
+      setMessage("No match found");
+    } else {
+      setSearchResults(results);
+      setMessage(`${results.length} match(s) found`);
+    }
+    setIsSearching(false);
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Search for a word..."
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <button type="submit" disabled={isSearching}>
+          {isSearching ? "Searching..." : "Search"}
+        </button>
+      </form>
+      <div>
+        {searchResults.map((result, index) => (
+          <div key={index}>{result}</div>
+        ))}
+      </div>
+      <div>
+        {searchNotFound ? (
+          <p style={{ color: "red" }}>{message}</p>
+        ) : (
+          <p>{message}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Search;
+```
+
+This implementation includes several additional features:
+
+- Input validation: it checks if the search term is empty and shows an error message.
+- Search message: it shows a message indicating whether the search is in progress, if the search was successful, or if no matches were found.
+- Debouncing: it disables the search button when a search is in progress to prevent multiple searches from being triggered at once.
+- Case insensitivity: it makes the search case-insensitive by converting both the search term and the words in the text to lowercase before comparing them.
+- Highlight the error message in red if no matches are found
+
+You can use this component in your parent component like this:
