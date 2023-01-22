@@ -459,19 +459,6 @@ body.hidden-scrolling {
     z-index: 9;
   }
 
-  /* ul.menu-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  ul.menu-list li {
-    margin: 10px 0;
-    font-size: 1.2rem;
-    opacity: 0;
-    visibility: hidden;
-  } */
-
   .navi-container .mobile-menu .menu-list {
     display: flex;
     flex-direction: column;
@@ -578,6 +565,19 @@ body.hidden-scrolling {
     width: 100%;
     height: auto;
     max-height: 300px;
+  }
+
+  ul.menu-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  ul.menu-list li {
+    margin: 10px 0;
+    font-size: 1.2rem;
+    /* opacity: 0;
+    visibility: hidden; */
   }
 }
 
