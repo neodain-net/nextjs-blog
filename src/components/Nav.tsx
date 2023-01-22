@@ -55,23 +55,23 @@ export default function Nav() {
           {items.map((item: Items, index: number) => {
             return (
               <li key={item.title} className="menu-item sub-item">
-                {/* <a href={item.link} onClick={() => handleClick(index)}> */}
-                <a href="#" onClick={() => handleClick(index)}>
+                <a
+                  href={item.subItems ? "#" : "/posts/service_c++"}
+                  onClick={() => handleClick(index)}
+                >
                   {item.title}
                   {item.subItems && <i className="plus"></i>}
                 </a>
-
-                {/* <li className="menu-item sub-item">
-                <a href="#" data-toggle="sub-menu">Pages<i className="plus"></i></a> */}
-
-                {/* {item.subItems && openIndex === index && ( */}
                 {item.subItems && (
                   <ul className="sub-menu">
                     {item.subItems.map((subItem) => (
                       <li key={subItem.title} className="menu-item">
-                        {/* <a href={subItem.link} onClick={() => handleClick(index)} > */}
-                        <a href="#" onClick={() => handleClick(index)}>
+                        <a
+                          href={subItem.subItems ? "#" : "/posts/nodejs"}
+                          onClick={() => handleClick(index)}
+                        >
                           {subItem.title}
+                          {subItem.subItems && <i className="plus"></i>}
                         </a>
                       </li>
                     ))}
