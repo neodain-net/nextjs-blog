@@ -106,7 +106,52 @@ body.hidden-scrolling {
 }
 
 .navi-container .navi-logo .brand-name {
-  margin: 0.5rem;
+  margin: 0 0.5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  display: flex;
+}
+
+.name-list {
+  padding-left: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.name-list li {
+  list-style: none;
+}
+
+.name-list li a {
+  text-decoration: none;
+}
+
+.name-1 a {
+  color: #4885f7;
+}
+
+.name-2 a {
+  color: #d64b4b;
+}
+
+.name-3 a {
+  color: #e9c44b;
+}
+
+.name-4 a {
+  color: #4885f7;
+}
+
+.name-5 a {
+  color: rgb(63, 148, 88);
+}
+
+.name-6 a {
+  color: #d64b4b;
+}
+
+.name-7 a {
+  color: #e9c44b;
 }
 
 .logo-img {
@@ -567,6 +612,7 @@ body.hidden-scrolling {
     max-height: 300px;
   }
 
+  /* 모바일화면 610px 이하 일 때 navi-menu 표시되어 추가 */
   ul.menu-list {
     display: flex;
     flex-direction: column;
